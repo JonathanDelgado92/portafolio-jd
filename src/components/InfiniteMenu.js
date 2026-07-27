@@ -106,11 +106,7 @@ export function initToolboxMenu(containerSelector) {
       dot.className = 'toolbox-dot';
       dot.setAttribute('aria-label', toolsData[i].title);
       dot.dataset.index = i;
-      dot.addEventListener('click', () => {
-        const targetAngle = -(i / toolsData.length) * Math.PI * 2;
-        targetAngleOffset = targetAngle;
-        if (hintEl) hintEl.classList.add('hidden');
-      });
+      dot.addEventListener('click', () => irA(i));
       dotsContainer.appendChild(dot);
       dots.push(dot);
     }
@@ -121,32 +117,94 @@ export function initToolboxMenu(containerSelector) {
   }
 
   // --- Interaction ---
+  const TAU = Math.PI * 2;
+  const PASO = TAU / toolsData.length;
+
   let angleOffset = 0;
-  let targetAngleOffset = -activeIndex * (Math.PI * 2 / toolsData.length);
+  let targetAngleOffset = -activeIndex * PASO;
   let velocity = 0;
   let isDragging = false;
   let prevX = 0;
+  let movido = false;
+  let inactivoDesde = performance.now();
+
+  /* Geometría del último fotograma, para poder saber qué icono se ha pulsado. */
+  let geo = { cx: 0, cy: 0, orbitR: 0, dotR: 0 };
+
+  /**
+   * Lleva el círculo hasta el elemento `i` por el camino más corto.
+   *
+   * El offset se acumula sin límite al arrastrar, así que fijar el ángulo
+   * absoluto del elemento hacía desandar todas las vueltas dadas. Aquí se
+   * busca la vuelta equivalente más cercana a la posición actual: el giro
+   * nunca retrocede más de media vuelta y puede recorrer los 360° completos.
+   */
+  function irA(i) {
+    const base = -i * PASO;
+    const diff = base - targetAngleOffset;
+    targetAngleOffset += diff - TAU * Math.round(diff / TAU);
+    inactivoDesde = performance.now();
+    if (hintEl) hintEl.classList.add('hidden');
+  }
 
   canvas.addEventListener('pointerdown', (e) => {
     isDragging = true;
+    movido = false;
     prevX = e.clientX;
     velocity = 0;
+    /* Sin captura, el navegador deja de enviar eventos en cuanto el dedo sale
+       del canvas y el giro se corta a medias. */
+    try { canvas.setPointerCapture(e.pointerId); } catch { /* no crítico */ }
     if (hintEl) hintEl.classList.add('hidden');
   });
 
   window.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
     const dx = e.clientX - prevX;
+    if (Math.abs(dx) > 2) movido = true;
     targetAngleOffset += dx * 0.006;
     velocity = dx * 0.006;
     prevX = e.clientX;
+    inactivoDesde = performance.now();
   });
 
-  window.addEventListener('pointerup', () => { isDragging = false; });
+  function soltar() {
+    isDragging = false;
+  }
+
+  window.addEventListener('pointerup', soltar);
+  /* Un gesto cancelado por el navegador dejaba isDragging en true para
+     siempre y el círculo quedaba bloqueado. */
+  window.addEventListener('pointercancel', soltar);
+
+  /* Pulsar directamente sobre un icono del orbe lo trae al frente. */
+  canvas.addEventListener('click', (e) => {
+    if (movido) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    let mejor = -1;
+    let mejorDist = Infinity;
+    for (let i = 0; i < toolsData.length; i++) {
+      const a = i * PASO + angleOffset;
+      const x = geo.cx + Math.cos(a) * geo.orbitR;
+      const y = geo.cy + Math.sin(a) * geo.orbitR;
+      const d = Math.hypot(px - x, py - y);
+      /* Radio de acierto generoso: los iconos del fondo se dibujan pequeños
+         y con el dedo cuesta acertarlos. */
+      if (d < geo.dotR * 1.6 && d < mejorDist) {
+        mejorDist = d;
+        mejor = i;
+      }
+    }
+    if (mejor >= 0) irA(mejor);
+  });
 
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     targetAngleOffset += e.deltaY * 0.003;
+    inactivoDesde = performance.now();
   }, { passive: false });
 
   // --- Render loop ---
@@ -167,7 +225,13 @@ export function initToolboxMenu(containerSelector) {
     // Deceleration
     if (!isDragging) {
       velocity *= 0.94;
-      targetAngleOffset += 0.0015;
+      /* La deriva automática solo entra tras unos segundos sin tocar nada.
+         Antes era constante y empujaba siempre en el mismo sentido, así que
+         al arrastrar hacia atrás el círculo se resistía y volvía: parecía que
+         solo se pudiera girar en una dirección. */
+      if (performance.now() - inactivoDesde > 2500) {
+        targetAngleOffset += 0.0015;
+      }
     }
     angleOffset += (targetAngleOffset - angleOffset) * 0.08;
 
@@ -176,6 +240,10 @@ export function initToolboxMenu(containerSelector) {
     const count = toolsData.length;
     const orbitR = Math.min(w, h) * 0.38;
     const dotR = Math.max(20, Math.min(w, h) * 0.042);
+
+    /* El manejador de clic necesita esta geometría para saber sobre qué icono
+       se ha pulsado; se guarda en cada fotograma porque depende del tamaño. */
+    geo = { cx, cy, orbitR, dotR };
 
     // Find active (closest to front)
     let bestIdx = 0;

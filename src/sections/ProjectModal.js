@@ -1,4 +1,5 @@
 import { projectsData } from '../data/projects.js';
+import { onSwipeX } from '../utils/swipe.js';
 
 function createLightbox(images, startIndex) {
   const overlay = document.createElement('div');
@@ -58,6 +59,9 @@ function createLightbox(images, startIndex) {
       if (e.key === 'ArrowLeft') navigate(-1);
       if (e.key === 'ArrowRight') navigate(1);
     });
+
+    /* En móvil el gesto natural para pasar de imagen es deslizar. */
+    onSwipeX(overlay, (dir) => navigate(dir));
   }
 
   function close() {
@@ -485,23 +489,36 @@ export function createProjectModal(project) {
     });
   }
 
+  /** Cierra este modal y abre el del proyecto indicado. */
+  function irAProyecto(destino) {
+    if (!destino) return;
+    close(true);
+    setTimeout(() => {
+      const modal = createProjectModal(destino);
+      document.body.appendChild(modal);
+      modal.scrollTop = 0;
+      requestAnimationFrame(() => {
+        modal.classList.add('active');
+        modal.focus();
+      });
+    }, 300);
+  }
+
   overlay.querySelectorAll('.project-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      const next = projectsData.find(p => p.id === id);
-      if (!next) return;
-      close(true);
-      setTimeout(() => {
-        const modal = createProjectModal(next);
-        document.body.appendChild(modal);
-        modal.scrollTop = 0;
-        requestAnimationFrame(() => {
-          modal.classList.add('active');
-          modal.focus();
-        });
-      }, 300);
+      irAProyecto(projectsData.find(p => p.id === btn.dataset.id));
     });
   });
+
+  /* Deslizar horizontalmente cambia de proyecto, como en una galería nativa.
+     Se escucha en el contenedor con scroll y no en el overlay para no chocar
+     con los gestos dentro de las cuadrículas de imágenes. */
+  const zonaScroll = overlay.querySelector('.project-modal-scroll');
+  if (zonaScroll) {
+    onSwipeX(zonaScroll, (dir) => {
+      irAProyecto(dir === 1 ? nextProject : prevProject);
+    }, { umbral: 70 });
+  }
 
   return overlay;
 }
