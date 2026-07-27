@@ -24,6 +24,7 @@ import { sections } from './data/sections.js';
 import { projectsData } from './data/projects.js';
 import { shouldAnimate } from './utils/reducedMotion.js';
 import { isMobile, isTouch } from './utils/responsive.js';
+import { rafWhenVisible } from './utils/rafWhenVisible.js';
 import { initScrollReveal } from './animations/scrollReveal.js';
 import { initKineticTextReveal } from './animations/kineticTextReveal.js';
 import { initTextHover } from './animations/textHover.js';
@@ -569,7 +570,6 @@ function initMarqueeDrag() {
       if (pos > 0) pos -= groupWidth;
     }
     track.style.transform = `translateX(${pos}px)`;
-    requestAnimationFrame(tick);
   }
 
   track.addEventListener('pointerdown', (e) => {
@@ -598,7 +598,9 @@ function initMarqueeDrag() {
   });
 
   track.style.cursor = 'grab';
-  requestAnimationFrame(tick);
+  /* Solo se desplaza con la franja en pantalla; antes corría durante todo el
+     recorrido de la página. */
+  rafWhenVisible(track, tick);
 }
 
 function initExperienceReveal() {

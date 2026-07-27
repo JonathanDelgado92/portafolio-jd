@@ -1,4 +1,5 @@
 import { toolsData } from '../data/tools.js';
+import { rafWhenVisible } from '../utils/rafWhenVisible.js';
 import { shouldAnimate } from '../utils/reducedMotion.js';
 
 export function initToolboxMenu(containerSelector) {
@@ -53,6 +54,9 @@ export function initToolboxMenu(containerSelector) {
     canvas.style.height = h + 'px';
     canvas._w = w;
     canvas._h = h;
+    /* Se guarda para que el bucle escale el contexto: el lienzo tiene w*dpr
+       píxeles pero se dibuja en coordenadas CSS. */
+    canvas._dpr = dpr;
     ready = true;
   }
 
@@ -146,15 +150,18 @@ export function initToolboxMenu(containerSelector) {
   }, { passive: false });
 
   // --- Render loop ---
-  function loop(time) {
-    requestAnimationFrame(loop);
+  function loop() {
 
     if (!ready) return;
     const w = canvas._w;
     const h = canvas._h;
     if (w === 0 || h === 0) return;
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    /* Escala por densidad de pantalla. Con la identidad, el dibujo ocupaba
+       solo el cuadrante superior izquierdo del lienzo (que tiene w*dpr px)
+       y el orbe se veía pequeño y descentrado dentro de su máscara. */
+    const dpr = canvas._dpr || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
     // Deceleration
@@ -183,7 +190,9 @@ export function initToolboxMenu(containerSelector) {
     }
 
     // Center glow
-    const pulse = 0.5 + 0.5 * Math.sin(time * 0.003);
+    /* El reloj sale de performance.now() y no del parámetro del rAF: el bucle
+       ya no se auto-encadena, lo gobierna rafWhenVisible. */
+    const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.003);
     const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, orbitR * 0.5);
     glowGrad.addColorStop(0, `rgba(234, 90, 39, ${0.08 + 0.04 * pulse})`);
     glowGrad.addColorStop(1, 'rgba(234, 90, 39, 0)');
@@ -310,5 +319,6 @@ export function initToolboxMenu(containerSelector) {
 
   updateInfo(activeIndex);
   updateDots(activeIndex);
-  requestAnimationFrame(loop);
+  /* El canvas solo dibuja con la sección del toolbox en pantalla. */
+  rafWhenVisible(canvas, loop);
 }

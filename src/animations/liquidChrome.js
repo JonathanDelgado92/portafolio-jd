@@ -1,3 +1,5 @@
+import { rafWhenVisible } from '../utils/rafWhenVisible.js';
+
 const vertexShaderSource = `
   attribute vec2 position;
   void main() {
@@ -142,7 +144,6 @@ export function initLiquidChrome(canvas, opts = {}) {
   const uAmp = gl.getUniformLocation(program, 'u_amplitude');
 
   let mouse = [0.5, 0.5];
-  let animId = null;
   let startTime = performance.now();
 
   function resize() {
@@ -172,22 +173,23 @@ export function initLiquidChrome(canvas, opts = {}) {
 
   resize();
 
-  function render(time) {
-    const elapsed = (time - startTime) * 0.001 * speed;
+  function render() {
+    const elapsed = (performance.now() - startTime) * 0.001 * speed;
     gl.uniform1f(uTime, elapsed);
     gl.uniform2f(uMouse, mouse[0], mouse[1]);
     gl.uniform3f(uColor, baseColor[0], baseColor[1], baseColor[2]);
     gl.uniform1f(uAmp, amplitude);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-    animId = requestAnimationFrame(render);
   }
 
-  animId = requestAnimationFrame(render);
+  /* El shader solo se dibuja con la sección de contacto en pantalla: antes
+     corría siempre, incluso con el usuario en el hero. */
+  const detener = rafWhenVisible(canvas, render);
 
   return () => {
     window.removeEventListener('resize', resize);
     canvas.removeEventListener('mousemove', handleMouse);
     canvas.removeEventListener('mouseleave', handleLeave);
-    if (animId) cancelAnimationFrame(animId);
+    detener();
   };
 }

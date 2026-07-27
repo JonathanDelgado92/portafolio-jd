@@ -139,19 +139,27 @@ export function initCoverflow({ onCardClick } = {}) {
   let startX = 0;
   let moved = false;
 
+  /* En pantalla táctil hace falta menos recorrido: el umbral de escritorio
+     obligaba a arrastrar 80px sobre una tarjeta que en móvil mide 245. */
+  const esTactil = window.matchMedia('(pointer: coarse)').matches;
+  const umbral = esTactil ? 40 : DRAG_THRESHOLD;
+
   function onPointerDown(e) {
     /* Un clic en las flechas no debe iniciar un arrastre. */
     if (e.button !== 0 || e.target.closest('.coverflow-nav')) return;
     isDown = true;
     moved = false;
     startX = e.clientX;
+    /* Captura del puntero: sin esto el navegador deja de mandar eventos en
+       cuanto el dedo sale del elemento o el gesto se interpreta como scroll. */
+    try { wrap.setPointerCapture(e.pointerId); } catch { /* no crítico */ }
   }
 
   function onPointerMove(e) {
     if (!isDown) return;
     const dx = e.clientX - startX;
     if (Math.abs(dx) > 5) moved = true;
-    if (Math.abs(dx) >= DRAG_THRESHOLD) {
+    if (Math.abs(dx) >= umbral) {
       const dir = dx > 0 ? -1 : 1;
       const next = ((active + dir) % n + n) % n;
       lock = true;
@@ -169,6 +177,9 @@ export function initCoverflow({ onCardClick } = {}) {
   wrap.addEventListener('pointerdown', onPointerDown);
   window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', onPointerUp);
+  /* Sin esto, un gesto cancelado por el navegador dejaba isDown en true para
+     siempre y el carrusel se quedaba muerto tras el primer intento táctil. */
+  window.addEventListener('pointercancel', onPointerUp);
 
   /* bound click handler: skip if user was dragging */
   function onClickSlide(i) {

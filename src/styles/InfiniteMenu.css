@@ -289,15 +289,37 @@
   }
 
   .toolbox-content {
-    padding-bottom: var(--space-2xl);
+    /* El hueco entre el orbe y la ficha de la herramienta era excesivo. */
+    gap: var(--space-md);
+    padding-bottom: var(--space-lg);
+  }
+
+  /* Casi todo el ancho disponible: el orbe se dibuja al 38% del contenedor,
+     así que agrandarlo es lo que hace crecer el círculo y lo centra mejor
+     dentro de su máscara circular. Se sale del padding del contenedor para
+     ganar los últimos píxeles. */
+  /* El padding lateral del wrapper anclaba la pista de la rejilla a la
+     izquierda y todo el desbordamiento del orbe caía a la derecha. Se quita
+     del wrapper y se devuelve solo a los bloques de texto, así el orbe puede
+     usar el ancho completo y centrarse de verdad. */
+  .toolbox-wrapper {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .toolbox-header,
+  .toolbox-info {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
   }
 
   .toolbox-menu-container {
-    width: min(88vw, 400px);
+    width: min(94vw, 440px);
+    justify-self: center;
   }
 
   .toolbox-hint {
-    bottom: var(--space-md);
+    bottom: var(--space-sm);
     font-size: 0.6rem;
   }
 }

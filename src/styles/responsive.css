@@ -225,9 +225,12 @@
     font-size: 12px;
   }
 
-  .contact-details {
-    margin-top: var(--space-xl);
-    padding-top: var(--space-xl);
+  /* Se quitaron margin-top y padding-top de 4rem cada uno: sumados al padding
+     de la tarjeta dejaban 192px de vacío sobre "Nombre" en móvil. Además
+     contradecían la regla base, que los fija en cero al no haber ya un filete
+     separador arriba. */
+  .contact-card-floating {
+    padding: var(--space-lg);
   }
 
   .footer-grid {

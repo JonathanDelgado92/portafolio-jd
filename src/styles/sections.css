@@ -338,6 +338,10 @@
   perspective: 1600px;
   user-select: none;
   -webkit-user-select: none;
+  /* pan-y cede el gesto vertical al scroll de la página pero reserva el
+     horizontal para el carrusel. Sin esto el navegador se quedaba el gesto
+     entero y cancelaba el arrastre: en móvil las tarjetas no se movían. */
+  touch-action: pan-y;
   margin-top: var(--space-2xl);
 }
 
