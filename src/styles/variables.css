@@ -1,0 +1,66 @@
+:root {
+  --color-black: #0a0a0a;
+  --color-carbon: #2B2B2E;
+  --color-dark: #2B2B2E;
+  --color-gray-800: #3a3a3a;
+  --color-gray-600: #6b6b6b;
+  --color-gray-500: #7a7a7a;
+  --color-gray-400: #9a9a9a;
+  --color-gray-200: #d0d0d0;
+  --color-gray-100: #e8e8e8;
+  --color-white: #fafafa;
+  --color-accent: #EA5A27;
+  --color-accent-dim: rgba(234, 90, 39, 0.15);
+  --color-accent-light: rgba(234, 90, 39, 0.08);
+  --color-accent-secondary: #F6A611;
+  --color-accent-tertiary: #CB791F;
+  --color-accent-muted: #9B4E2A;
+
+  --font-primary: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --text-hero: clamp(3rem, 10vw, 8rem);
+  --text-hero-sub: clamp(1.25rem, 3vw, 2.5rem);
+  --text-section-title: clamp(2rem, 5vw, 4.5rem);
+  --text-section-sub: clamp(1rem, 1.5vw, 1.75rem);
+  --text-body: clamp(0.875rem, 1.2vw, 1.125rem);
+  --text-body-lg: clamp(1rem, 1.5vw, 1.375rem);
+  --text-meta: clamp(0.75rem, 0.9vw, 0.875rem);
+  --text-small: clamp(0.625rem, 0.8vw, 0.75rem);
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+  --space-3xl: 8rem;
+  --space-4xl: 12rem;
+  --space-5xl: 16rem;
+
+  --container-max: 1440px;
+  --container-padding: clamp(1rem, 3vw, 3rem);
+
+  --z-menu: 1000;
+  --z-preloader: 2000;
+  --z-header: 100;
+  --z-cursor: 9999;
+  --z-scroll-progress: 90;
+
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+
+  --duration-slow: 1.2s;
+  --duration-medium: 0.8s;
+  --duration-fast: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-slow: 0.01ms;
+    --duration-medium: 0.01ms;
+    --duration-fast: 0.01ms;
+  }
+}

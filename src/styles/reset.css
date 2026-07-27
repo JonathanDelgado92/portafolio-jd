@@ -1,0 +1,105 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-secondary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+  font-weight: normal;
+}
+
+p {
+  overflow-wrap: break-word;
+}
+
+[data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.app-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-black);
+  z-index: 10000;
+}
+
+.app-loading-inner {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.app-loading-isotipo {
+  width: 72px;
+  height: auto;
+  color: var(--color-white);
+  opacity: 0.4;
+  animation: loadingPulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-isotipo { animation: none; }
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}

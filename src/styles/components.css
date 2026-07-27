@@ -1,0 +1,770 @@
+/* ===========================
+   SKIP LINK
+   =========================== */
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-md);
+  z-index: 10000;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--text-small);
+  font-weight: 500;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: var(--space-md);
+}
+
+/* ===========================
+   FOCUS VISIBLE
+   =========================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===========================
+   HEADER
+   =========================== */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Por encima del panel del menú: si no, el panel tapa el botón de cerrar. */
+  z-index: calc(var(--z-menu) + 10);
+  padding: var(--space-lg) var(--container-padding);
+  transition: background 0.6s var(--ease-out-expo), padding 0.6s var(--ease-out-expo);
+  mix-blend-mode: difference;
+}
+
+/* Con el menú abierto, el difference invertiría el isotipo y el toggle sobre
+   el panel carbón y las capas naranjas. */
+body:has(.staggered-menu-wrapper[data-open]) .header {
+  mix-blend-mode: normal;
+}
+
+.header.scrolled {
+  background: var(--color-black);
+  padding: var(--space-md) var(--container-padding);
+  mix-blend-mode: normal;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  /* El isotipo pinta con currentColor: basta con fijar el color aquí. */
+  color: var(--color-white);
+  transition: opacity 0.3s;
+}
+
+.header-logo .isotipo {
+  display: block;
+  width: clamp(28px, 2.6vw, 36px);
+  height: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .header-logo:hover {
+    opacity: 0.7;
+  }
+}
+
+/* La navegación horizontal y el enlace al CV se movieron al panel del
+   staggered menu; sus estilos viven ahí (.sm-panel-item, .sm-cv). */
+
+/* El botón hamburguesa de dos líneas se sustituyó por el toggle del staggered
+   menu (texto + icono en cruz). Sus estilos están más abajo, junto al menú. */
+
+/* ===========================
+   STAGGERED MENU
+   Port de StaggeredMenu (React Bits) con la paleta del portafolio:
+   el panel original es blanco y las capas moradas; aquí el panel es carbón
+   y las capas usan los naranjas de marca.
+   =========================== */
+
+.staggered-menu-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  pointer-events: none;
+  --sm-accent: var(--color-accent);
+  --sm-panel-width: clamp(280px, 38vw, 440px);
+}
+
+.sm-prelayers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--sm-panel-width);
+  pointer-events: none;
+  z-index: 5;
+}
+
+[data-position='left'] .sm-prelayers {
+  right: auto;
+  left: 0;
+}
+
+.sm-prelayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+
+.sm-prelayer--1 { background: var(--color-accent-muted); }
+.sm-prelayer--2 { background: var(--color-accent); }
+
+.staggered-menu-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--sm-panel-width);
+  height: 100%;
+  background: var(--color-carbon);
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--space-3xl) + var(--space-md)) var(--space-lg) var(--space-lg);
+  overflow-y: auto;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+[data-position='left'] .staggered-menu-panel {
+  right: auto;
+  left: 0;
+}
+
+.sm-panel-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sm-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  counter-reset: smItem;
+}
+
+/* overflow oculto: es lo que recorta la entrada de cada enlace desde abajo. */
+.sm-panel-itemWrap {
+  position: relative;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.sm-panel-item {
+  position: relative;
+  display: inline-block;
+  padding-right: 1.6em;
+  font-family: var(--font-primary);
+  font-size: clamp(2rem, 5.5vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.25s var(--ease-out-cubic);
+}
+
+.sm-panel-itemLabel {
+  display: inline-block;
+  will-change: transform;
+  transform-origin: 50% 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sm-panel-item:hover {
+    color: var(--sm-accent);
+  }
+}
+
+.sm-panel-item:focus-visible {
+  outline: 2px solid var(--sm-accent);
+  outline-offset: 4px;
+}
+
+.sm-panel-list[data-numbering] .sm-panel-item::after {
+  counter-increment: smItem;
+  content: counter(smItem, decimal-leading-zero);
+  position: absolute;
+  top: 0.15em;
+  right: 0;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--sm-accent);
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--sm-num-opacity, 0);
+}
+
+/* Acción destacada del panel: antes vivía en la cabecera. */
+.sm-cv {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--color-gray-800);
+  border-radius: 4px;
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: background 0.3s var(--ease-out-cubic),
+              border-color 0.3s var(--ease-out-cubic),
+              color 0.3s var(--ease-out-cubic);
+}
+
+.sm-cv-arrow {
+  transition: transform 0.3s var(--ease-out-cubic);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sm-cv:hover {
+    background: var(--sm-accent);
+    border-color: var(--sm-accent);
+    color: var(--color-white);
+  }
+
+  .sm-cv:hover .sm-cv-arrow {
+    transform: translateY(3px);
+  }
+}
+
+.sm-cv:focus-visible {
+  outline: 2px solid var(--sm-accent);
+  outline-offset: 3px;
+}
+
+.sm-socials {
+  padding-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sm-socials-title {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sm-accent);
+}
+
+.sm-socials-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.sm-socials-link {
+  display: inline-block;
+  padding: 2px 0;
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  color: var(--color-gray-200);
+  text-decoration: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+/* Al pasar por encima de la lista se atenúan las demás. */
+@media (hover: hover) and (pointer: fine) {
+  .sm-socials-list:hover .sm-socials-link:not(:hover) {
+    opacity: 0.35;
+  }
+
+  .sm-socials-link:hover {
+    color: var(--sm-accent);
+  }
+}
+
+.sm-socials-list:focus-within .sm-socials-link:not(:focus-visible) {
+  opacity: 0.35;
+}
+
+.sm-socials-link:focus-visible {
+  outline: 2px solid var(--sm-accent);
+  outline-offset: 3px;
+}
+
+/* ─── botón de alternancia ─── */
+
+.header-menu-btn.sm-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-white);
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  z-index: calc(var(--z-menu) + 1);
+}
+
+.sm-toggle-textWrap {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Ancho fijo: "Menú" y "Cerrar" miden distinto y si no el icono se desplaza
+     al alternar. */
+  min-width: 3.6em;
+  text-align: right;
+}
+
+.sm-toggle-textInner {
+  display: block;
+  line-height: 1;
+}
+
+.sm-icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.sm-icon-line {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+@media (max-width: 640px) {
+  .staggered-menu-wrapper {
+    --sm-panel-width: 100%;
+  }
+
+  .sm-toggle-textWrap {
+    display: none;
+  }
+}
+
+/* ===========================
+   PRELOADER
+   =========================== */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-preloader);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-black);
+  pointer-events: all;
+}
+
+.preloader.hidden {
+  pointer-events: none;
+}
+
+.preloader-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--color-black);
+}
+
+.preloader-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.preloader-logo {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+}
+
+.preloader-isotipo {
+  width: clamp(64px, 12vw, 104px);
+  height: auto;
+  color: var(--color-white);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: preloaderInitial 0.8s var(--ease-out-expo) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-isotipo {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@keyframes preloaderInitial {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preloader-bar-wrapper {
+  width: 200px;
+  height: 1px;
+  background: var(--color-gray-800);
+  margin: 0 auto var(--space-md);
+  overflow: hidden;
+}
+
+.preloader-bar {
+  height: 100%;
+  width: 0;
+  background: var(--color-accent);
+}
+
+.preloader-percentage {
+  font-family: var(--font-secondary);
+  font-size: var(--text-small);
+  color: var(--color-gray-400);
+  letter-spacing: 0.1em;
+}
+
+/* ===========================
+   CUSTOM CURSOR
+   =========================== */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+  display: none;
+}
+
+@media (hover: hover) {
+  .custom-cursor {
+    display: block;
+  }
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-white);
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s;
+}
+
+.custom-cursor.hovering .cursor-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--color-accent);
+}
+
+.custom-cursor.hovering .cursor-ring {
+  width: 60px;
+  height: 60px;
+  border-color: var(--color-accent);
+}
+
+.custom-cursor.view-project .cursor-text {
+  opacity: 1;
+  transform: translate(-50%, -100%) translateY(-10px);
+}
+
+.cursor-text {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* ===========================
+   SCROLL PROGRESS
+   =========================== */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: var(--z-scroll-progress);
+  background: transparent;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--color-accent);
+  transition: width 0.1s linear;
+}
+
+/* ===========================
+   FOOTER
+   =========================== */
+
+.footer {
+  padding: var(--space-3xl) 0 var(--space-2xl);
+  border-top: 1px solid var(--color-gray-800);
+  background: var(--color-carbon);
+}
+
+.footer .container {
+  max-width: 800px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-xl);
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.footer-logo {
+  display: inline-flex;
+  color: var(--color-white);
+}
+
+.footer-logo .isotipo {
+  display: block;
+  width: 40px;
+  height: auto;
+}
+
+.footer-tagline {
+  font-size: var(--text-small);
+  color: var(--color-gray-400);
+  margin-top: var(--space-xs);
+}
+
+.footer-back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  border: 1px solid var(--color-gray-700);
+  border-radius: 6px;
+  color: var(--color-gray-400);
+  font-size: var(--text-small);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+  font-family: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer-back-to-top:hover {
+    color: var(--color-white);
+    border-color: var(--color-gray-400);
+  }
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-gray-800);
+}
+
+.footer-bottom p {
+  font-size: var(--text-small);
+  /* gray-600 sobre el carbón del footer no llega al mínimo AA. */
+  color: var(--color-gray-400);
+}
+
+.footer-credit {
+  color: var(--color-gray-500);
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    text-align: center;
+  }
+
+  .footer-back-to-top {
+    justify-content: center;
+  }
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.3s, color 0.3s, transform 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-arrow {
+  display: inline-block;
+  transition: transform 0.3s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background: var(--color-accent);
+    color: var(--color-black);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-600);
+  padding-bottom: var(--space-xs);
+  transition: color 0.3s, border-color 0.3s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-secondary:hover {
+    color: var(--color-white);
+    border-color: var(--color-white);
+  }
+}
+
+/* ─── BUTTON FX-26 (Gradient Slide) ─── */
+
+.btn {
+  --bink: var(--color-white);
+  --bsurf: var(--color-black);
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 13px 24px;
+  border: 1px solid var(--bink);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bink);
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.btn-label {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  transition: inherit;
+}
+
+.fx-26 {
+  background: linear-gradient(90deg, var(--bink) 0 50%, var(--bsurf) 50% 100%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.45s ease, color 0.45s ease;
+}
+
+.fx-26::before { display: none; }
+
+.fx-26:hover { background-position: 0 0; color: var(--bsurf); }

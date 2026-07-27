@@ -1,0 +1,13 @@
+node_modules
+mockups
+.git
+dist
+.vite
+*.ps1
+*.md
+*.yml
+.gitignore
+_originales
+PORTAFOLIO WEB.zip
+admin-api
+tasks

@@ -1,0 +1,27 @@
+services:
+  portafolio:
+    build: .
+    ports:
+      - "8080:80"
+    container_name: jonathan-delgado-portfolio
+    depends_on:
+      - admin-api
+    volumes:
+      - ./public/assets/images:/usr/share/nginx/html/assets/images
+
+  admin-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    ports:
+      - "3001:3001"
+    container_name: jd-admin-api
+    volumes:
+      - ./public/assets/images:/app/images
+      - ./src/data:/app/data
+      - ./tasks:/app/tasks
+    environment:
+      - NODE_ENV=production
+      - DATA_DIR=/app/data
+      - IMAGES_DIR=/app/images
+      - TASKS_DIR=/app/tasks

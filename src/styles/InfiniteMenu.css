@@ -1,0 +1,303 @@
+/* ─── TOOLBOX SECTION ─── */
+.toolbox {
+  position: relative;
+  min-height: 100svh;
+  height: auto;
+  background: var(--color-black);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbox-wrapper {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(24px, 6vw, 96px);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ─── HEADER ─── */
+.toolbox-header {
+  /* Eran 12rem, que sumadas al padding de la sección anterior dejaban 288px
+     de vacío entre las tarjetas de formación y este titular. */
+  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+}
+
+.toolbox .section-label {
+  color: var(--color-gray-500);
+}
+
+.toolbox-header h2 {
+  font-weight: 700;
+  font-size: var(--text-section-title);
+  line-height: 1.0;
+  color: var(--color-white);
+  margin: var(--space-md) 0 0;
+}
+
+/* El carrusel muestra una herramienta cada vez, así que el alcance real solo
+   se descubría arrastrando. Este contador lo dice de un vistazo. */
+.toolbox-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: var(--space-md);
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gray-500);
+}
+
+.toolbox-count span:not(.toolbox-count-sep) {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-accent);
+}
+
+.toolbox-count-sep {
+  color: var(--color-gray-800);
+}
+
+.toolbox-header-line {
+  width: 48px;
+  height: 2px;
+  background: var(--color-accent);
+  margin: var(--space-lg) 0;
+}
+
+.toolbox-intro {
+  color: var(--color-gray-400);
+  font-size: var(--text-body);
+  max-width: 60ch;
+  line-height: 1.6;
+}
+
+/* ─── CONTENT GRID ─── */
+.toolbox-content {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.85fr) minmax(min(480px, 100%), 1.15fr);
+  gap: clamp(40px, 6vw, 110px);
+  align-items: center;
+  flex: 1;
+  padding-bottom: var(--space-4xl);
+}
+
+/* ─── INFO BLOCK ─── */
+.toolbox-info {
+  max-width: 520px;
+}
+
+.toolbox-info-number {
+  font-family: var(--font-primary);
+  font-size: var(--text-meta);
+  color: var(--color-accent);
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.toolbox-info-category {
+  font-family: var(--font-primary);
+  font-size: var(--text-small);
+  color: var(--color-gray-400);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+.toolbox-info-title {
+  font-family: var(--font-primary);
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+  color: var(--color-white);
+  font-weight: 500;
+  margin: 0 0 var(--space-sm);
+  line-height: 1.2;
+}
+
+.toolbox-info-desc {
+  font-size: var(--text-body);
+  color: var(--color-gray-400);
+  line-height: 1.6;
+  margin: 0 0 var(--space-md);
+}
+
+/* ─── DOTS ─── */
+.toolbox-dots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbox-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gray-600);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  padding: 0;
+}
+
+.toolbox-dot:hover {
+  background: var(--color-gray-400);
+  transform: scale(1.2);
+}
+
+.toolbox-dot.active {
+  background: var(--color-accent);
+  transform: scale(1.3);
+}
+
+/* ─── CANVAS CONTAINER ─── */
+.toolbox-menu-container {
+  position: relative;
+  width: clamp(440px, 48vw, 720px);
+  aspect-ratio: 1;
+  background: var(--color-black);
+  overflow: hidden;
+  border-radius: 50%;
+  justify-self: end;
+}
+
+#infinite-menu-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+#infinite-menu-canvas:active {
+  cursor: grabbing;
+}
+
+.toolbox-hint {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-primary);
+  font-size: var(--text-small);
+  color: var(--color-gray-500);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.toolbox-hint.hidden {
+  opacity: 0;
+}
+
+/* ─── FALLBACK ─── */
+.toolbox-fallback {
+  display: none;
+  padding: var(--space-xl) var(--container-padding);
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.toolbox-fallback-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-md);
+}
+
+.toolbox-fallback-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-carbon);
+  border-radius: 4px;
+  font-size: var(--text-body);
+  color: var(--color-gray-200);
+}
+
+.toolbox-fallback-item img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* ─── REDUCED MOTION ─── */
+@media (prefers-reduced-motion: reduce) {
+  .toolbox-menu-container {
+    display: none;
+  }
+
+  .toolbox-fallback {
+    display: block;
+  }
+}
+
+/* ─── TABLET + MOBILE ─── */
+@media (max-width: 1024px) {
+  .toolbox-content {
+    gap: clamp(30px, 4vw, 60px);
+  }
+
+  .toolbox-menu-container {
+    width: clamp(380px, 50vw, 520px);
+  }
+}
+
+@media (max-width: 900px) {
+  .toolbox-content {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .toolbox-header {
+    padding-top: var(--space-3xl);
+    margin-bottom: var(--space-lg);
+  }
+
+  .toolbox-menu-container {
+    width: min(86vw, 500px);
+    justify-self: center;
+    order: 1;
+  }
+
+  .toolbox-info {
+    max-width: 100%;
+    order: 2;
+  }
+
+  .toolbox-info-desc {
+    max-width: 100%;
+  }
+
+  .toolbox-dots {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbox-header {
+    padding-top: var(--space-2xl);
+  }
+
+  .toolbox-content {
+    padding-bottom: var(--space-2xl);
+  }
+
+  .toolbox-menu-container {
+    width: min(88vw, 400px);
+  }
+
+  .toolbox-hint {
+    bottom: var(--space-md);
+    font-size: 0.6rem;
+  }
+}
