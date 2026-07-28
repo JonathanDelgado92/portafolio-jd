@@ -220,9 +220,14 @@ export function initLiquidChrome(canvas, opts = {}) {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
-  /* El shader solo se dibuja con la sección de contacto en pantalla: antes
-     corría siempre, incluso con el usuario en el hero. */
-  const detener = rafWhenVisible(canvas, render);
+  /* El shader solo se dibuja con la sección de contacto cerca: antes corría
+     siempre, incluso con el usuario en el hero.
+     El margen es amplio a propósito. Con los 200 px por defecto, el lienzo
+     seguía vacío hasta casi tenerlo delante y pagaba justo ahí su arranque
+     —medido: 53 ms de compilación y 36 ms en el primer dibujo, bastante más
+     en un móvil—, así que el fondo aparecía de golpe y con retraso.
+     Empezando una pantalla antes llega ya dibujado. */
+  const detener = rafWhenVisible(canvas, render, { margin: 900 });
 
   return () => {
     window.removeEventListener('resize', resize);
