@@ -229,6 +229,18 @@ export function initLiquidChrome(canvas, opts = {}) {
      Empezando una pantalla antes llega ya dibujado. */
   const detener = rafWhenVisible(canvas, render, { margin: 900 });
 
+  /* Un primer dibujo en cuanto el navegador esté ocioso.
+     El margen de arriba solo sirve si se llega bajando: pulsando "Contacto"
+     en el menú se salta directo y el shader pagaría su arranque en frío
+     justo al aterrizar, con el fondo en negro. Pintando un fotograma por
+     adelantado el lienzo nunca está vacío, y como el contexto conserva el
+     búfer esa imagen aguanta hasta que el bucle tome el relevo.
+     Se hace en tiempo ocioso para no competir con la carga inicial. */
+  const ocioso = window.requestIdleCallback || ((f) => setTimeout(f, 1200));
+  ocioso(() => {
+    if (canvas.isConnected) render();
+  });
+
   return () => {
     window.removeEventListener('resize', resize);
     canvas.removeEventListener('mousemove', handleMouse);
