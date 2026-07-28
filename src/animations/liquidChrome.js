@@ -101,7 +101,12 @@ export function initLiquidChrome(canvas, opts = {}) {
     interactive = true,
   } = opts;
 
-  const gl = canvas.getContext('webgl');
+  /* preserveDrawingBuffer es imprescindible con el tope de fotogramas: por
+     defecto WebGL vacía el búfer tras componer, así que en los fotogramas
+     que no se redibujan el fondo se compondría transparente y la sección se
+     quedaba en negro. Conservándolo, un fotograma saltado sigue mostrando
+     el último dibujo. */
+  const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
   if (!gl) return;
 
   function compileShader(source, type) {
@@ -146,11 +151,29 @@ export function initLiquidChrome(canvas, opts = {}) {
   let mouse = [0.5, 0.5];
   let startTime = performance.now();
 
+  /**
+   * Escala de render, deliberadamente por debajo de la densidad de pantalla.
+   *
+   * El shader hace cinco fbm por píxel, y cada uno acaba en dieciséis senos:
+   * unos ochenta por píxel y fotograma. A densidad nativa, un móvil con DPR 3
+   * tiene que resolver casi tres millones de píxeles sesenta veces por
+   * segundo, y ahí es donde el scroll se atasca.
+   *
+   * Como el fondo es una nube difusa sin detalle fino, renderizar por debajo
+   * y dejar que el navegador lo estire no se nota: se pierde nitidez que la
+   * imagen nunca tuvo. Bajar de 3 a 1 recorta el trabajo nueve veces.
+   */
+  function escalaRender() {
+    const dpr = window.devicePixelRatio || 1;
+    const movil = window.matchMedia('(pointer: coarse)').matches;
+    return Math.min(dpr, movil ? 1 : 1.5);
+  }
+
   function resize() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    const escala = escalaRender();
+    canvas.width = Math.max(1, Math.round(rect.width * escala));
+    canvas.height = Math.max(1, Math.round(rect.height * escala));
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.uniform2f(uRes, canvas.width, canvas.height);
   }
@@ -173,8 +196,18 @@ export function initLiquidChrome(canvas, opts = {}) {
 
   resize();
 
+  /* Tope de fotogramas: el fondo se mueve muy despacio, así que a 30 se ve
+     igual y se libera la mitad del trabajo de GPU justo mientras se hace
+     scroll, que es cuando el navegador más lo necesita. */
+  const MS_POR_FOTOGRAMA = 1000 / 30;
+  let ultimoDibujo = 0;
+
   function render() {
-    const elapsed = (performance.now() - startTime) * 0.001 * speed;
+    const ahora = performance.now();
+    if (ahora - ultimoDibujo < MS_POR_FOTOGRAMA) return;
+    ultimoDibujo = ahora;
+
+    const elapsed = (ahora - startTime) * 0.001 * speed;
     gl.uniform1f(uTime, elapsed);
     gl.uniform2f(uMouse, mouse[0], mouse[1]);
     gl.uniform3f(uColor, baseColor[0], baseColor[1], baseColor[2]);
