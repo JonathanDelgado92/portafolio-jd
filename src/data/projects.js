@@ -7,7 +7,7 @@ export const projectsData = [
     number: '01',
     title: 'Baukra',
     categories: ['Visual Systems', 'Brand Identity', 'Dirección Visual'],
-    year: '2024',
+    year: '2026',
     cover: '/assets/img/projects/baukra/baukra.webp',
     gallery: [
       '/assets/img/projects/baukra/baukra-visual-systems-studio-09-04.webp',
@@ -136,7 +136,7 @@ export const projectsData = [
     number: '04',
     title: 'Sencia',
     categories: ['Brand Identity', 'Mockups Editoriales', 'Visual System'],
-    year: '2025',
+    year: '2026',
     cover: '/assets/img/projects/sencia/sencia.webp',
     gallery: [
       '/assets/img/projects/sencia/1.webp',
@@ -289,7 +289,7 @@ export const projectsData = [
     number: '08',
     title: 'Campus Grupal',
     categories: ['Rebranding', 'Identidad Visual', 'Diseño Web', 'Sistema Visual'],
-    year: '2024',
+    year: '2026',
     cover: '/assets/img/projects/campus-grupal/campus-grupal.webp',
     gallery: [
       '/assets/img/projects/campus-grupal/1.webp',

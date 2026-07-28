@@ -14,20 +14,20 @@
 export function onSwipeX(el, onSwipe, { umbral = 50 } = {}) {
   let x0 = 0;
   let y0 = 0;
-  let activo = false;
+  let idPuntero = null;
 
   function inicio(e) {
     /* Solo gestos táctiles o de lápiz: con ratón el arrastre horizontal
        suele ser selección de texto, no navegación. */
     if (e.pointerType === 'mouse') return;
-    activo = true;
+    idPuntero = e.pointerId;
     x0 = e.clientX;
     y0 = e.clientY;
   }
 
   function fin(e) {
-    if (!activo) return;
-    activo = false;
+    if (idPuntero === null || e.pointerId !== idPuntero) return;
+    idPuntero = null;
     const dx = e.clientX - x0;
     const dy = e.clientY - y0;
     /* Si el desplazamiento vertical manda, era un scroll: no se toca. */
@@ -35,17 +35,23 @@ export function onSwipeX(el, onSwipe, { umbral = 50 } = {}) {
     onSwipe(dx < 0 ? 1 : -1);
   }
 
-  function cancelar() {
-    activo = false;
+  function cancelar(e) {
+    if (e.pointerId === idPuntero) idPuntero = null;
   }
 
+  /* El gesto empieza en el elemento pero termina en window a propósito:
+     escuchando el pointerup solo en el elemento, levantar el dedo fuera de
+     él —lo normal al deslizar hacia el borde de la pantalla— perdía el
+     gesto. No se usa setPointerCapture porque redirige el pointerup y sitúa
+     el click en el ancestro común, así que los botones de cerrar, anterior
+     y siguiente dejarían de responder. */
   el.addEventListener('pointerdown', inicio);
-  el.addEventListener('pointerup', fin);
-  el.addEventListener('pointercancel', cancelar);
+  window.addEventListener('pointerup', fin);
+  window.addEventListener('pointercancel', cancelar);
 
   return () => {
     el.removeEventListener('pointerdown', inicio);
-    el.removeEventListener('pointerup', fin);
-    el.removeEventListener('pointercancel', cancelar);
+    window.removeEventListener('pointerup', fin);
+    window.removeEventListener('pointercancel', cancelar);
   };
 }

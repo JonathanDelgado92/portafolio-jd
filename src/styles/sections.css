@@ -663,6 +663,10 @@
   width: 100%;
   height: 100vh;
   overflow-y: auto;
+  /* El eje vertical sigue siendo del navegador y el horizontal es nuestro:
+     sin declararlo, un deslizamiento que empiece cerca del borde dispara la
+     navegación "atrás" del móvil en vez de cambiar de proyecto. */
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.12) transparent;
@@ -1178,6 +1182,9 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
+  /* Mismo motivo que en la ficha: el deslizamiento horizontal lo gestiona
+     el visor, no el gesto de "atrás" del navegador. */
+  touch-action: pan-y;
   display: flex;
   align-items: center;
   justify-content: center;

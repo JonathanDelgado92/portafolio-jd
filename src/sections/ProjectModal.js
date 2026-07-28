@@ -61,15 +61,20 @@ function createLightbox(images, startIndex) {
     });
 
     /* En móvil el gesto natural para pasar de imagen es deslizar. */
-    onSwipeX(overlay, (dir) => navigate(dir));
+    soltarDeslizamiento = onSwipeX(overlay, (dir) => navigate(dir));
   }
 
   function close() {
+    /* El detector está en window: sin soltarlo, cada apertura del visor
+       dejaría uno más escuchando y una imagen saltaría varias posiciones. */
+    soltarDeslizamiento?.();
+    soltarDeslizamiento = null;
     overlay.remove();
     previouslyFocused?.focus?.();
   }
 
   const previouslyFocused = document.activeElement;
+  let soltarDeslizamiento = null;
 
   render();
   attachEvents();
@@ -426,10 +431,13 @@ export function createProjectModal(project) {
   });
 
   const previouslyFocused = document.activeElement;
+  let soltarDeslizamiento = null;
 
   /* keepLocked: al saltar de un proyecto a otro el modal sigue abierto,
      así que no se debe devolver el scroll al body. */
   const close = (keepLocked = false) => {
+    soltarDeslizamiento?.();
+    soltarDeslizamiento = null;
     overlay.classList.remove('active');
     if (!keepLocked) {
       document.body.style.overflow = '';
@@ -515,7 +523,10 @@ export function createProjectModal(project) {
      con los gestos dentro de las cuadrículas de imágenes. */
   const zonaScroll = overlay.querySelector('.project-modal-scroll');
   if (zonaScroll) {
-    onSwipeX(zonaScroll, (dir) => {
+    /* El detector vive en window, así que hay que soltarlo al cerrar: si no,
+       las fichas ya cerradas seguirían atendiendo gestos y un deslizamiento
+       saltaría varios proyectos de golpe. */
+    soltarDeslizamiento = onSwipeX(zonaScroll, (dir) => {
       irAProyecto(dir === 1 ? nextProject : prevProject);
     }, { umbral: 70 });
   }
