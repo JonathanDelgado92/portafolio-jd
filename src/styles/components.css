@@ -89,7 +89,7 @@ body:has(.staggered-menu-wrapper[data-open]) .header {
 }
 
 /* La navegación horizontal y el enlace al CV se movieron al panel del
-   staggered menu; sus estilos viven ahí (.sm-panel-item, .sm-cv). */
+   staggered menu; sus estilos viven ahí (.sm-panel-item, .sm-socials). */
 
 /* El botón hamburguesa de dos líneas se sustituyó por el toggle del staggered
    menu (texto + icono en cruz). Sus estilos están más abajo, junto al menú. */
@@ -224,50 +224,12 @@ body:has(.staggered-menu-wrapper[data-open]) .header {
   opacity: var(--sm-num-opacity, 0);
 }
 
-/* Acción destacada del panel: antes vivía en la cabecera. */
-.sm-cv {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--color-gray-800);
-  border-radius: 4px;
-  font-family: var(--font-primary);
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-white);
-  text-decoration: none;
-  transition: background 0.3s var(--ease-out-cubic),
-              border-color 0.3s var(--ease-out-cubic),
-              color 0.3s var(--ease-out-cubic);
-}
-
-.sm-cv-arrow {
-  transition: transform 0.3s var(--ease-out-cubic);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sm-cv:hover {
-    background: var(--sm-accent);
-    border-color: var(--sm-accent);
-    color: var(--color-white);
-  }
-
-  .sm-cv:hover .sm-cv-arrow {
-    transform: translateY(3px);
-  }
-}
-
-.sm-cv:focus-visible {
-  outline: 2px solid var(--sm-accent);
-  outline-offset: 3px;
-}
-
+/* La descarga del CV se movió a "Sobre mí" (.about-cv-btn): es donde el
+   visitante ya está leyendo la trayectoria, y el menú queda solo para
+   navegar. El margin-top:auto que empujaba el bloque al fondo del panel
+   vivía en ese botón, así que pasa aquí. */
 .sm-socials {
+  margin-top: auto;
   padding-top: var(--space-lg);
   display: flex;
   flex-direction: column;

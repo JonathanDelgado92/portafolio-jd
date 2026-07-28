@@ -124,7 +124,8 @@ export function initToolboxMenu(containerSelector) {
   let targetAngleOffset = -activeIndex * PASO;
   let velocity = 0;
   let isDragging = false;
-  let prevX = 0;
+  let anguloPrevio = 0;
+  let recorrido = 0;
   let movido = false;
   let inactivoDesde = performance.now();
 
@@ -147,10 +148,25 @@ export function initToolboxMenu(containerSelector) {
     if (hintEl) hintEl.classList.add('hidden');
   }
 
+  /**
+   * Ángulo del puntero respecto al centro del orbe.
+   *
+   * El giro se calcula con este ángulo y no con el desplazamiento horizontal.
+   * Midiendo solo la X, arrastrar hacia abajo no hacía nada y, según por qué
+   * lado del círculo se agarrase, el giro salía al revés de lo que empujaba
+   * el dedo. Con el ángulo, el icono que se agarra se queda pegado al dedo:
+   * sube cuando se sube y baja cuando se baja, en cualquier punto del borde.
+   */
+  function anguloPuntero(e) {
+    const rect = canvas.getBoundingClientRect();
+    return Math.atan2(e.clientY - rect.top - geo.cy, e.clientX - rect.left - geo.cx);
+  }
+
   canvas.addEventListener('pointerdown', (e) => {
     isDragging = true;
     movido = false;
-    prevX = e.clientX;
+    recorrido = 0;
+    anguloPrevio = anguloPuntero(e);
     velocity = 0;
     /* Sin captura, el navegador deja de enviar eventos en cuanto el dedo sale
        del canvas y el giro se corta a medias. */
@@ -160,11 +176,25 @@ export function initToolboxMenu(containerSelector) {
 
   window.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
-    const dx = e.clientX - prevX;
-    if (Math.abs(dx) > 2) movido = true;
-    targetAngleOffset += dx * 0.006;
-    velocity = dx * 0.006;
-    prevX = e.clientX;
+    const actual = anguloPuntero(e);
+    /* Normalizado a (-π, π]: si no, cruzar el punto de corte de atan2 daría
+       un salto de una vuelta entera en un solo fotograma. */
+    let delta = actual - anguloPrevio;
+    delta -= TAU * Math.round(delta / TAU);
+    /* Cerca del centro el ángulo se dispara: unos pocos píxeles barren media
+       vuelta. Se limita el giro por fotograma para que arrastrar sobre el
+       icono central siga respondiendo sin salir despedido. */
+    const TOPE = 0.35;
+    delta = Math.max(-TOPE, Math.min(TOPE, delta));
+
+    recorrido += Math.abs(delta);
+    /* Umbral en radianes: el clic solo se descarta si el dedo ha girado de
+       verdad, no por el temblor de un toque. */
+    if (recorrido > 0.04) movido = true;
+
+    targetAngleOffset += delta;
+    velocity = delta;
+    anguloPrevio = actual;
     inactivoDesde = performance.now();
   });
 

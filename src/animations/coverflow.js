@@ -138,6 +138,7 @@ export function initCoverflow({ onCardClick } = {}) {
   let isDown = false;
   let startX = 0;
   let moved = false;
+  let punteroId = null;
 
   /* En pantalla táctil hace falta menos recorrido: el umbral de escritorio
      obligaba a arrastrar 80px sobre una tarjeta que en móvil mide 245. */
@@ -150,15 +151,25 @@ export function initCoverflow({ onCardClick } = {}) {
     isDown = true;
     moved = false;
     startX = e.clientX;
-    /* Captura del puntero: sin esto el navegador deja de mandar eventos en
-       cuanto el dedo sale del elemento o el gesto se interpreta como scroll. */
-    try { wrap.setPointerCapture(e.pointerId); } catch { /* no crítico */ }
+    punteroId = e.pointerId;
   }
 
   function onPointerMove(e) {
     if (!isDown) return;
     const dx = e.clientX - startX;
-    if (Math.abs(dx) > 5) moved = true;
+    if (Math.abs(dx) > 5) {
+      /* La captura se pide aquí y no en pointerdown a propósito. Capturar
+         desde el primer contacto redirige el pointerup al wrapper, y el
+         navegador sitúa el click en el ancestro común de pointerdown y
+         pointerup: dejaba de llegar a la tarjeta y no se abría el proyecto.
+         Pidiéndola solo cuando el gesto ya es un arrastre, el toque simple
+         conserva su click y el arrastre sigue recibiendo eventos aunque el
+         dedo se salga del carrusel. */
+      if (!moved && punteroId !== null) {
+        try { wrap.setPointerCapture(punteroId); } catch { /* no crítico */ }
+      }
+      moved = true;
+    }
     if (Math.abs(dx) >= umbral) {
       const dir = dx > 0 ? -1 : 1;
       const next = ((active + dir) % n + n) % n;
@@ -172,6 +183,10 @@ export function initCoverflow({ onCardClick } = {}) {
 
   function onPointerUp() {
     isDown = false;
+    if (punteroId !== null) {
+      try { wrap.releasePointerCapture(punteroId); } catch { /* ya liberada */ }
+      punteroId = null;
+    }
   }
 
   wrap.addEventListener('pointerdown', onPointerDown);
@@ -207,6 +222,7 @@ export function initCoverflow({ onCardClick } = {}) {
       wrap.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
       slides.forEach((slide) => {
         slide.replaceWith(slide.cloneNode(true));
       });

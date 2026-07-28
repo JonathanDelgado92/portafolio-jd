@@ -18,6 +18,10 @@ export function createAbout() {
             <span class="about-quote-mark">"</span>
             <p class="scroll-reveal">${siteConfig.aboutHighlight}</p>
           </blockquote>
+          <a href="${siteConfig.cvUrl}" download class="btn fx-26 about-cv-btn"
+             aria-label="Descargar la hoja de vida de Jonathan Delgado en PDF">
+            <span class="btn-label">Descargar CV ↓</span>
+          </a>
         </div>
         <div class="about-image-col">
           <figure class="about-image-wrapper tilted-card-figure">

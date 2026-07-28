@@ -2536,6 +2536,23 @@
   justify-content: center;
 }
 
+/* Segunda vía de descarga, en "Sobre mí": es donde se lee la trayectoria,
+   así el CV deja de depender de que el visitante abra el menú.
+   A diferencia del de contacto no ocupa todo el ancho: la columna de texto
+   es larga y un botón a sangre entera la dominaría. */
+.about-cv-btn {
+  display: inline-flex;
+  margin-top: var(--space-xl);
+}
+
+@media (max-width: 480px) {
+  .about-cv-btn {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .contact-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

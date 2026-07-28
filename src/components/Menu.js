@@ -42,13 +42,6 @@ export function createMenu() {
           `).join('')}
         </ul>
 
-        <a class="sm-cv" href="${siteConfig.cvUrl}" download
-           aria-label="Descargar CV en PDF"
-           target="_blank" rel="noopener noreferrer">
-          <span>Descargar CV</span>
-          <span class="sm-cv-arrow" aria-hidden="true">↓</span>
-        </a>
-
         <div class="sm-socials">
           <h3 class="sm-socials-title">Sígueme</h3>
           <ul class="sm-socials-list" role="list">

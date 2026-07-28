@@ -306,7 +306,6 @@ function initMenu() {
   const numberItems = [...panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item')];
   const socialTitle = panel.querySelector('.sm-socials-title');
   const socialLinks = [...panel.querySelectorAll('.sm-socials-link')];
-  const cvBtn = panel.querySelector('.sm-cv');
   const icon = btn.querySelector('.sm-icon');
   const plusH = btn.querySelector('.sm-icon-line:not(.sm-icon-line-v)');
   const plusV = btn.querySelector('.sm-icon-line-v');
@@ -327,7 +326,6 @@ function initMenu() {
     gsap.set(numberItems, { '--sm-num-opacity': 0 });
     if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
     gsap.set(socialLinks, { y: 25, opacity: 0 });
-    if (cvBtn) gsap.set(cvBtn, { y: 25, opacity: 0 });
   }
 
   resetPanelContent();
@@ -362,9 +360,6 @@ function initMenu() {
     }, itemsStart + 0.1);
 
     const socialsStart = panelStart + panelDuration * 0.4;
-    if (cvBtn) {
-      tl.to(cvBtn, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, socialsStart - 0.06);
-    }
     if (socialTitle) {
       tl.to(socialTitle, { opacity: 1, duration: 0.5, ease: 'power2.out' }, socialsStart);
     }
