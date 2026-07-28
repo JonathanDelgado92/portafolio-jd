@@ -22,3 +22,6 @@ admin-api
 
 # Entorno local del editor
 .claude
+
+# Restos del panel de administración
+tasks/
