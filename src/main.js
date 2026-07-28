@@ -554,17 +554,30 @@ function initMarqueeDrag() {
   let lastX = 0;
   let dragVelocity = 0;
 
+  /* Mantiene la posición dentro de un ciclo, venga por donde venga: el
+     desplazamiento automático solo resta, pero arrastrando se avanza en los
+     dos sentidos y sin esto la banda se salía del bucle por la derecha. */
+  function normalizar() {
+    while (pos <= -groupWidth) pos += groupWidth;
+    while (pos > 0) pos -= groupWidth;
+  }
+
   function tick() {
+    /* Mientras el dedo está apoyado no se toca la posición: de eso se
+       encarga pointermove. Antes se sumaba también aquí la velocidad, así
+       que el recorrido se contaba dos veces y el arrastre iba a saltos. */
     if (!isDragging) {
-      pos += speed;
-      if (pos <= -groupWidth) pos += groupWidth;
-    } else {
-      dragVelocity *= 0.92;
-      pos += dragVelocity;
-      if (pos <= -groupWidth) pos += groupWidth;
-      if (pos > 0) pos -= groupWidth;
+      if (Math.abs(dragVelocity) > 0.05) {
+        /* Inercia al soltar, que antes se descartaba de golpe. */
+        pos += dragVelocity;
+        dragVelocity *= 0.94;
+      } else {
+        dragVelocity = 0;
+        pos += speed;
+      }
+      normalizar();
+      track.style.transform = `translateX(${pos}px)`;
     }
-    track.style.transform = `translateX(${pos}px)`;
   }
 
   track.addEventListener('pointerdown', (e) => {
@@ -578,19 +591,21 @@ function initMarqueeDrag() {
     if (!isDragging) return;
     const dx = e.clientX - lastX;
     pos += dx;
+    /* La velocidad se guarda para la inercia posterior, no para aplicarla ya. */
     dragVelocity = dx * 0.6;
     lastX = e.clientX;
+    normalizar();
+    track.style.transform = `translateX(${pos}px)`;
   });
 
-  window.addEventListener('pointerup', () => {
+  function soltar() {
+    if (!isDragging) return;
     isDragging = false;
     track.style.cursor = 'grab';
-  });
+  }
 
-  window.addEventListener('pointercancel', () => {
-    isDragging = false;
-    track.style.cursor = 'grab';
-  });
+  window.addEventListener('pointerup', soltar);
+  window.addEventListener('pointercancel', soltar);
 
   track.style.cursor = 'grab';
   /* Solo se desplaza con la franja en pantalla; antes corría durante todo el
@@ -864,6 +879,17 @@ function initTiltCards() {
 
     wrap.addEventListener('pointermove', onPointerMove);
     wrap.addEventListener('pointerleave', onPointerLeave);
+
+    /* En pantalla táctil no hay hover: pointermove solo llega mientras el
+       dedo está apoyado, así que el resaltado se perdía al levantarlo. Al
+       tocar se marca la tarjeta y se desmarcan las demás, de modo que el
+       filete naranja señala una sola a la vez. */
+    wrap.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      document.querySelectorAll('.t-tilt.is-selected')
+        .forEach((otra) => { if (otra !== wrap) otra.classList.remove('is-selected'); });
+      wrap.classList.toggle('is-selected');
+    });
   });
 }
 

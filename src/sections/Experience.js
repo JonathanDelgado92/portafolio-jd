@@ -60,7 +60,7 @@ export function createExperience() {
               <div class="education-item-top">
                 <h3 class="education-item-degree">${edu.degree}</h3>
                 <span class="education-item-badge${edu.isFinished ? ' is-done' : ''}">
-                  ${edu.isFinished ? 'Completado' : 'En pausa'}
+                  ${edu.badge || (edu.isFinished ? 'Completado' : 'Cursada')}
                 </span>
               </div>
               <p class="education-item-institution">${edu.institution}</p>

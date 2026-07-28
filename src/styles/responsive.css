@@ -111,8 +111,26 @@
     clip-path: none;
   }
 
+  /* Al 15% la foto casi desaparecía en el móvil. Se sube bastante y la
+     legibilidad se protege con el velo de abajo, que oscurece donde está el
+     texto en vez de apagar la imagen entera por igual. */
   .hero-image {
-    opacity: 0.15;
+    opacity: 0.42;
+  }
+
+  /* Denso al pie, donde se apoya el titular, y suave arriba, para que el
+     rostro se vea sin restar contraste al texto. */
+  .hero-image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 10, 10, 0.28) 0%,
+      rgba(10, 10, 10, 0.55) 45%,
+      rgba(10, 10, 10, 0.88) 100%
+    );
+    pointer-events: none;
   }
 
   .hero-subtitle-wrapper,

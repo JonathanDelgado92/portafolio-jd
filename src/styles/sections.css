@@ -30,6 +30,7 @@
 }
 
 .hero-image-wrapper {
+  position: relative;   /* ancla el velo degradado del móvil */
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -1586,6 +1587,10 @@
   display: flex;
   width: fit-content;
   will-change: transform;
+  /* El eje vertical sigue siendo del navegador para poder seguir bajando por
+     la página, pero el horizontal es nuestro: sin declararlo, en el móvil el
+     navegador se quedaba el gesto y la banda apenas se movía al arrastrar. */
+  touch-action: pan-y;
   /* El mismo gap que dentro del grupo: sin esto, en la costura entre un grupo
      y el siguiente el ✦ final queda pegado a la primera palabra. */
   gap: clamp(1.5rem, 2.5vw, 3rem);
@@ -1657,36 +1662,80 @@
    APPROACH
    =========================== */
 
+/* Mismo tratamiento que "Sobre mí" —retícula tenue sobre fondo oscuro—
+   pero a medio camino entre el carbón y el negro: en negro puro la sección
+   quedaba plana, y con el carbón de "Sobre mí" los paneles perdían
+   contraste contra el fondo. */
 .approach {
   position: relative;
-  background: var(--color-black);
+  background: #1D1D20;
   padding: var(--space-4xl) 0;
 }
 
+.approach::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* Rejilla de una sola columna, centrada y del ancho del título.
+   La línea decorativa se inserta como bloque después del h2, y en un
+   contenedor con text-align:center el texto se centra pero el bloque no:
+   se quedaba pegado al borde izquierdo de la sección, flotando solo.
+   Con justify-content:center la columna mide lo que el título y se centra,
+   así que anclando la línea a su inicio cae bajo la primera letra. */
 .approach .section-header {
+  display: grid;
+  justify-content: center;
   text-align: center;
   margin-bottom: var(--space-3xl);
+}
+
+.approach .section-header .section-header-line {
+  justify-self: start;
 }
 
 .approach .section-header h2 {
   color: var(--color-white);
 }
 
+/* stretch y no start: con start cada tarjeta se ajustaba a su propio texto y
+   la tercera, que tiene una línea más, sobresalía. Igualadas a la altura de
+   la fila, el bloque se lee como una unidad. */
 .approach-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-xl);
-  align-items: start;
+  align-items: stretch;
 }
 
+/* La tarjeta debe ocupar toda la celda ya igualada; si no, estirar la
+   rejilla no serviría de nada porque el panel seguiría midiendo su texto. */
+.approach-tilt,
+.approach-tilt .t-tilt-card,
+.approach-panel {
+  height: 100%;
+}
+
+/* El realce no viene de oscurecer el fondo: la tarjeta ya es más oscura que
+   él, así que bajar el fondo las acerca y las disimula. Lo que las separa es
+   el borde y la sombra. El filete superior, más claro, simula una luz
+   cenital y despega la tarjeta del plano. */
 .approach-panel {
   padding: var(--space-2xl) var(--space-xl);
   background: rgba(10, 20, 28, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top-color: rgba(255, 255, 255, 0.18);
   border-radius: 16px;
-  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.75),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
   text-align: center;
   transition: box-shadow 0.5s var(--ease-out-cubic), border-color 0.5s var(--ease-out-cubic);
 }
@@ -1695,9 +1744,16 @@
   margin-top: 0 !important;
 }
 
-.t-tilt.is-hover .approach-panel {
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.15);
+/* Realce al señalar la tarjeta: el filete pasa a naranja y se refuerza con
+   un halo del mismo tono.
+   is-selected existe porque is-hover se pone con pointermove y en una
+   pantalla táctil solo dura lo que el dedo esté encima: al levantarlo se
+   perdería el resaltado justo cuando el usuario quiere verlo. */
+.t-tilt.is-hover .approach-panel,
+.t-tilt.is-selected .approach-panel {
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(234, 90, 39, 0.35);
+  border-color: var(--color-accent);
 }
 
 .approach-panel-content {
@@ -1768,9 +1824,11 @@
     transition: none;
   }
 
-  .t-tilt.is-hover .approach-panel {
+  /* Se suaviza la sombra, pero el filete naranja se mantiene: es una señal
+     de estado, no un adorno en movimiento. */
+  .t-tilt.is-hover .approach-panel,
+  .t-tilt.is-selected .approach-panel {
     box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
   }
 }
 

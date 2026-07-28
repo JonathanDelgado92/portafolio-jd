@@ -3,7 +3,7 @@ export const siteConfig = {
   firstName: 'Jonathan',
   lastName: 'Delgado',
   title: 'Diseñador Gráfico & Multimedia',
-  subtitle: 'Dirección Visual · Diseño Web · IA Aplicada',
+  subtitle: 'Branding · Dirección visual · Diseño web · Motion graphics · IA aplicada',
   tagline: 'Creo identidades, experiencias digitales y sistemas visuales que transforman ideas en marcas claras, coherentes y memorables.',
   aboutText: `Soy diseñador gráfico y multimedia con más de seis años de experiencia desarrollando comunicación visual, campañas, identidades y contenido para entornos institucionales y marcas.
 
