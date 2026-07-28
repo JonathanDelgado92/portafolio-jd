@@ -163,10 +163,15 @@ export function initLiquidChrome(canvas, opts = {}) {
    * y dejar que el navegador lo estire no se nota: se pierde nitidez que la
    * imagen nunca tuvo. Bajar de 3 a 1 recorta el trabajo nueve veces.
    */
+  const movil = () => window.matchMedia('(pointer: coarse)').matches;
+
   function escalaRender() {
     const dpr = window.devicePixelRatio || 1;
-    const movil = window.matchMedia('(pointer: coarse)').matches;
-    return Math.min(dpr, movil ? 1 : 1.5);
+    /* En móvil se baja a la mitad del tamaño CSS: cuatro veces menos píxeles
+       que a escala 1. A 35% de opacidad y detrás de un degradado, la nube no
+       tiene detalle que perder, y es justo durante el scroll cuando el
+       teléfono necesita la GPU para componer la página. */
+    return movil() ? 0.5 : Math.min(dpr, 1.5);
   }
 
   function resize() {
@@ -196,10 +201,10 @@ export function initLiquidChrome(canvas, opts = {}) {
 
   resize();
 
-  /* Tope de fotogramas: el fondo se mueve muy despacio, así que a 30 se ve
-     igual y se libera la mitad del trabajo de GPU justo mientras se hace
-     scroll, que es cuando el navegador más lo necesita. */
-  const MS_POR_FOTOGRAMA = 1000 / 30;
+  /* Tope de fotogramas: el fondo se mueve muy despacio, así que bajarlo no
+     se nota y libera GPU justo mientras se hace scroll, que es cuando el
+     navegador más la necesita. En móvil se baja a 20. */
+  const MS_POR_FOTOGRAMA = 1000 / (movil() ? 20 : 30);
   let ultimoDibujo = 0;
 
   function render() {

@@ -1,5 +1,6 @@
 import { projectsData } from '../data/projects.js';
 import { onSwipeX } from '../utils/swipe.js';
+import { atributosResponsive } from '../utils/imagenResponsive.js';
 
 function createLightbox(images, startIndex) {
   const overlay = document.createElement('div');
@@ -108,10 +109,16 @@ export function createProjectModal(project) {
   overlay.className = 'project-modal';
   overlay.tabIndex = -1;
 
+  /* Las miniaturas ocupan una columna del ancho de la ficha: en móvil ronda
+     el 45% de la pantalla, en escritorio no pasa de 480 px. Se declara así
+     para que el navegador elija la variante pequeña y no descodifique el
+     original de 1800 px para un hueco de 160. */
+  const TAMANOS_GALERIA = '(max-width: 768px) 45vw, 480px';
+
   function galleryGrid(images, baseIndex = 0) {
     return images.map((img, i) => `
       <div class="gallery-item" data-index="${baseIndex + i}">
-        <img src="${img}" alt="" loading="lazy" />
+        <img src="${img}"${atributosResponsive(img, TAMANOS_GALERIA)} alt="" loading="lazy" decoding="async" />
       </div>
     `).join('');
   }
@@ -137,7 +144,7 @@ export function createProjectModal(project) {
   function manualGrid(pages, from = 0) {
     return pages.map((img, i) => `
       <div class="manual-item" data-index="${from + i}">
-        <img src="${img}" alt="Manual de marca — Página ${from + i + 1}" loading="lazy" />
+        <img src="${img}"${atributosResponsive(img, TAMANOS_GALERIA)} alt="Manual de marca — Página ${from + i + 1}" loading="lazy" decoding="async" />
       </div>
     `).join('');
   }
@@ -331,7 +338,7 @@ export function createProjectModal(project) {
                       <div class="beforeafter-images">
                         ${project.beforeAfter.before.map(img => `
                           <div class="gallery-item" data-ba="before">
-                            <img src="${img}" alt="Antes" loading="lazy" />
+                            <img src="${img}"${atributosResponsive(img, TAMANOS_GALERIA)} alt="Antes" loading="lazy" decoding="async" />
                           </div>
                         `).join('')}
                       </div>
@@ -341,7 +348,7 @@ export function createProjectModal(project) {
                       <div class="beforeafter-images">
                         ${project.beforeAfter.after.map(img => `
                           <div class="gallery-item" data-ba="after">
-                            <img src="${img}" alt="Después" loading="lazy" />
+                            <img src="${img}"${atributosResponsive(img, TAMANOS_GALERIA)} alt="Después" loading="lazy" decoding="async" />
                           </div>
                         `).join('')}
                       </div>
